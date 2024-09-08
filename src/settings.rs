@@ -295,8 +295,11 @@ impl RunData {
     }
     // r = L / (1 + e^(-k * (w - w_0)))
     fn calc_rest_time(&self) -> std::time::Duration {
-        let w = self.up.get_time().as_secs() as f64;
+        let w = self.up.get_time().as_secs_f64();
+        // let w = std::time::Duration::from_secs(30).as_secs_f64();
         let r = self.l as f64 / (1.0 + std::f64::consts::E.powf(-self.k * (w - self.w0 as f64)));
+
+        // panic!("r = {}\nl = {}\nk = {}\nw = {}\nw0 = {}", r, self.l, self.k, w, self.w0);
         std::time::Duration::from_secs_f64(r)
     }
     fn play_sound(&mut self, path: Result<&str, GetPathErr>) -> Result<(), RunDataErr> {
@@ -359,9 +362,9 @@ impl RunData {
                     self.mode_transition = false;
 
                     self.mode = TimerMode::Rest;
-                    self.up = super::timer::Timer::new();
 
                     self.down.init(self.calc_rest_time());
+                    self.up = super::timer::Timer::new();
                     // self.down.init(std::time::Duration::from_secs(30));
                 }
             }
@@ -489,4 +492,9 @@ impl RunData {
             ),
         }
     }
+}
+
+#[cfg(test)]
+fn test_calc_rest_time() {
+    
 }

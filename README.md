@@ -38,7 +38,6 @@ cargo build --release
 - `2`: `restart_sound`として再生する音声ファイルのパスの設定
 - `3`: `remind_sound`として再生する音声ファイルのパスの設定
 
-
 ## カスタマイズ
 
 初回起動時に`.config/majitimer/config.json`ファイルが自動生成されます。
