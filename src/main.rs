@@ -23,7 +23,6 @@ use ratatui::{
     Frame,
 };
 
-
 pub struct App {
     settings: settings::Settings,
     run: settings::RunData,
@@ -85,6 +84,15 @@ impl App {
             KeyCode::Char('i') | KeyCode::Char('I') => {
                 if let Ok(path) = settings::path_picker(false) {
                     self.settings = settings::Settings::import(&path).unwrap();
+                    self.settings
+                        .export(
+                            &dirs::config_dir()
+                                .unwrap()
+                                .join("majitimer")
+                                .join("config.json"),
+                        )
+                        .unwrap();
+
                     self.run.update(&self.settings);
                 }
             }
@@ -103,7 +111,12 @@ impl App {
                 if let Ok(path) = settings::path_picker(false) {
                     self.settings.other.set_finish_sound(&path);
                     self.settings
-                        .export(&path::Path::new("config.json"))
+                        .export(
+                            &dirs::config_dir()
+                                .unwrap()
+                                .join("majitimer")
+                                .join("config.json"),
+                        )
                         .unwrap();
                 }
             }
@@ -111,7 +124,12 @@ impl App {
                 if let Ok(path) = settings::path_picker(false) {
                     self.settings.other.set_restart_sound(&path);
                     self.settings
-                        .export(&path::Path::new("config.json"))
+                        .export(
+                            &dirs::config_dir()
+                                .unwrap()
+                                .join("majitimer")
+                                .join("config.json"),
+                        )
                         .unwrap();
                 }
             }
@@ -119,7 +137,12 @@ impl App {
                 if let Ok(path) = settings::path_picker(false) {
                     self.settings.other.set_remind_sound(&path);
                     self.settings
-                        .export(&path::Path::new("config.json"))
+                        .export(
+                            &dirs::config_dir()
+                                .unwrap()
+                                .join("majitimer")
+                                .join("config.json"),
+                        )
                         .unwrap();
                 }
             }

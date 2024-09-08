@@ -37,7 +37,6 @@ impl Timer {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Other {
-    pub restart: usize,
     pub remind: usize,
     finish_sound: String,
     restart_sound: String,
@@ -53,7 +52,6 @@ pub enum GetPathErr {
 impl Other {
     fn template() -> Self {
         Self {
-            restart: 20,
             remind: 10,
             finish_sound: String::new(),
             restart_sound: String::new(),
@@ -156,17 +154,19 @@ impl Settings {
         }
     }
     pub fn init() -> Result<Self, SettingsErr> {
-        let input = std::env::current_dir()?.join("config.json");
+        let input = dirs::config_dir().unwrap()
+            .join("majitimer")
+            .join("config.json");
         if input.exists() {
-            Ok(Self::import(&input)?)
+            Ok(Self::import(&input).unwrap())
         } else {
             let template = Self::template();
-            template.export(&input)?;
+            template.export(&input).unwrap();
             Ok(template)
         }
     }
     pub fn import(path: &path::Path) -> Result<Self, SettingsErr> {
-        let input = std::fs::read_to_string(path)?;
+        let input = std::fs::read_to_string(path).unwrap();
         // 指定したパスのjsonファイルが存在する場合はそこから読み込む。
         if let Ok(deserialized) = serde_json::from_str(&input) {
             return Ok(deserialized);
@@ -175,15 +175,19 @@ impl Settings {
         }
     }
     pub fn export(&self, path: &path::Path) -> Result<(), SettingsErr> {
-        let mut file = std::fs::File::create(&path)?;
-        file.write_all(serde_json::to_string_pretty(&self)?.as_bytes())?;
+        let parent_dir = path.parent().unwrap();
+        if !parent_dir.exists() {
+            std::fs::create_dir_all(parent_dir).unwrap();
+        }
+        let mut file = std::fs::File::create(&path).expect(&format!("{:?}", path));
+        file.write_all(serde_json::to_string_pretty(&self).unwrap().as_bytes()).unwrap();
 
         Ok(())
     }
 }
 #[cfg(not(target_arch = "wasm32"))]
 pub fn path_picker(save_file: bool) -> Result<path::PathBuf, SettingsErr> {
-    let path = std::env::current_dir()?;
+    let path = dirs::home_dir().unwrap();
     let builder = rfd::FileDialog::new().set_directory(&path);
 
     if save_file {
